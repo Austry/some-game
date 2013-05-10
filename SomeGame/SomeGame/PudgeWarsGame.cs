@@ -15,7 +15,7 @@ namespace SomeGame
     /// <summary>
     /// This is the main type for your game
     /// </summary>
-    public class Game1 : Microsoft.Xna.Framework.Game
+    public class PudgeWarsGame : Microsoft.Xna.Framework.Game
     {
         static public GraphicsDeviceManager graphics;
         static public SpriteBatch spriteBatch;
@@ -27,7 +27,7 @@ namespace SomeGame
         MouseController mouseConroller;
         MainHero mainHero;
 
-        public Game1()
+        public PudgeWarsGame()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";

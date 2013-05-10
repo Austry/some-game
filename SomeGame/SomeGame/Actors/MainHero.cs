@@ -66,7 +66,7 @@ namespace SomeGame.Actors
 
         public void Draw(SpriteBatch spriteBatch) 
         {
-            spriteBatch.Draw(Game1.heroSprite,Vector2.Subtract(heroPositionVector,indentVector),Color.White);
+            spriteBatch.Draw(PudgeWarsGame.heroSprite,Vector2.Subtract(heroPositionVector,indentVector),Color.White);
         }
     }
 }
