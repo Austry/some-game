@@ -31,7 +31,10 @@ namespace SomeGame
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            
+
+            graphics.PreferredBackBufferWidth = 1024; //ширина экрана 
+            graphics.PreferredBackBufferHeight = 768; //его высота   
+            graphics.IsFullScreen = false; //включаем полноэкранный режим
         }
 
      
@@ -41,7 +44,9 @@ namespace SomeGame
 
             mouseConroller = new MouseController();
             mainHero = new MainHero();
+
             
+
             base.Initialize();
         }
 
