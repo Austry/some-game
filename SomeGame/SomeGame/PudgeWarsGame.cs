@@ -56,7 +56,8 @@ namespace SomeGame
           
             spriteBatch = new SpriteBatch(GraphicsDevice);
             cursorSprite = Content.Load<Texture2D>("cursor");
-            heroSprite = Content.Load<Texture2D>("hero");
+            heroSprite = Content.Load<Texture2D>("hero-sprite");
+            
         
         }
 
@@ -84,7 +85,7 @@ namespace SomeGame
             GraphicsDevice.Clear(Color.White);
             spriteBatch.Begin();
 
-            mainHero.Draw(spriteBatch);
+            mainHero.Draw(spriteBatch,gameTime);
 
             mouseConroller.Draw(spriteBatch);
             
