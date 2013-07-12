@@ -20,8 +20,8 @@ namespace SomeGame
         static public GraphicsDeviceManager graphics;
         static public SpriteBatch spriteBatch;
         //--------------Textures-----------
-        static public Texture2D cursorSprite;
-        static public Texture2D heroSprite;
+        static private Texture2D cursorSprite;
+        static private Texture2D heroSprite;
         //---------------------------------
 
         MouseController mouseConroller;
@@ -42,10 +42,6 @@ namespace SomeGame
         {
             Window.Title = "PudgeWars";
 
-            mouseConroller = new MouseController();
-            mainHero = new MainHero();
-
-            
 
             base.Initialize();
         }
@@ -55,9 +51,18 @@ namespace SomeGame
         {
           
             spriteBatch = new SpriteBatch(GraphicsDevice);
+            
+            Services.AddService(typeof(SpriteBatch),spriteBatch);
+            
             cursorSprite = Content.Load<Texture2D>("cursor");
             heroSprite = Content.Load<Texture2D>("hero-sprite");
-            
+
+            mouseConroller = new MouseController(this,cursorSprite);
+            Components.Add(mouseConroller);
+
+            mainHero = new MainHero(this,heroSprite);
+            Components.Add(mainHero);
+
         
         }
 
@@ -72,9 +77,9 @@ namespace SomeGame
         {
           
 
-            mouseConroller.Update();
+        
 
-            mainHero.Update();
+            
             
             base.Update(gameTime);
         }
@@ -85,17 +90,16 @@ namespace SomeGame
             GraphicsDevice.Clear(Color.White);
             spriteBatch.Begin();
 
-            mainHero.Draw(spriteBatch,gameTime);
+          
 
-            mouseConroller.Draw(spriteBatch);
-            
-            
-            
+
+
+            base.Draw(gameTime);
             
             spriteBatch.End();
            
 
-            base.Draw(gameTime);
+            
         }
     }
 }

@@ -5,10 +5,11 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Content;
 
 namespace SomeGame.Actors
 {
-    class MainHero
+    class MainHero : DrawableGameComponent
     {
         
 
@@ -32,16 +33,20 @@ namespace SomeGame.Actors
         private float totalTime, timeForFrame = 0.5f;
         //----- индикатор фрейма
         private int frame;
+        //----- Текстура героя
+        Texture2D heroSprite;
 
-        
+        SpriteBatch spriteBatch;
 
-        public MainHero() {
+        public MainHero(Game game,Texture2D heroSprite):base(game) {
             heroPositionVector = Vector2.Add(heroPositionVector,indentVector);
-            
+            this.heroSprite = heroSprite;
         }
 
+    
+   
 
-        public void Update() 
+        public override void Update(GameTime gameTime) 
         {   
             mouseState = Mouse.GetState();
             
@@ -53,23 +58,39 @@ namespace SomeGame.Actors
                 isMoving = true;
                 
                 //Определение направления движения
-                if(targetCoordinats.X >= heroPositionVector.X && targetCoordinats.Y >= heroPositionVector.Y ){
+                if (targetCoordinats.Y - heroPositionVector.Y >= targetCoordinats.X - heroPositionVector.X 
+                    && targetCoordinats.Y - heroPositionVector.Y >= -(targetCoordinats.X - heroPositionVector.X))
+                {
                     directionFlag = 1;
                 }
-                if (targetCoordinats.X <= heroPositionVector.X && targetCoordinats.Y >= heroPositionVector.Y)
-                {
-                    directionFlag = 2;
-                }
-                if (targetCoordinats.X < heroPositionVector.X && targetCoordinats.Y < heroPositionVector.Y)
-                {
-                    directionFlag = 3;
-                }
-                if (targetCoordinats.X >= heroPositionVector.X && targetCoordinats.Y <= heroPositionVector.Y)
+                if (targetCoordinats.Y - heroPositionVector.Y <= targetCoordinats.X - heroPositionVector.X
+                    && targetCoordinats.Y - heroPositionVector.Y >= -(targetCoordinats.X - heroPositionVector.X))
                 {
                     directionFlag = 4;
                 }
+                if (targetCoordinats.Y - heroPositionVector.Y < targetCoordinats.X - heroPositionVector.X
+                   && targetCoordinats.Y - heroPositionVector.Y < -(targetCoordinats.X - heroPositionVector.X))
+                {
+                    directionFlag = 3;
+                }
 
+                if (targetCoordinats.Y - heroPositionVector.Y > targetCoordinats.X - heroPositionVector.X
+                   && targetCoordinats.Y - heroPositionVector.Y < -(targetCoordinats.X - heroPositionVector.X))
+                {
+                    directionFlag = 2;
+                }
+                     /*  if (targetCoordinats.X < heroPositionVector.X && targetCoordinats.Y < heroPositionVector.Y)
+                       {
+                           directionFlag = 3;
+                       }
+                       if (targetCoordinats.X >= heroPositionVector.X && targetCoordinats.Y <= heroPositionVector.Y)
+                       {
+                           directionFlag = 4;
+                       }
+                */
 
+              
+               
 
                 //Определения вектора скорости
                 heroSpeedVector.X = heroPositionVector.X - targetCoordinats.X;
@@ -95,9 +116,9 @@ namespace SomeGame.Actors
         
         }
 
-        public void Draw(SpriteBatch spriteBatch, GameTime gameTime) 
+        public override void Draw(GameTime gameTime) 
         {
-            
+            spriteBatch = (SpriteBatch)Game.Services.GetService(typeof(SpriteBatch)); 
             totalTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             if (totalTime > timeForFrame)
@@ -111,10 +132,10 @@ namespace SomeGame.Actors
 
             if (!isMoving)
             {
-                spriteBatch.Draw(PudgeWarsGame.heroSprite, Vector2.Subtract(heroPositionVector, indentVector), new Rectangle(0, 0, 30, 62), Color.White);
+                spriteBatch.Draw(heroSprite, Vector2.Subtract(heroPositionVector, indentVector), new Rectangle(0, 0, 30, 62), Color.White);
             }
             else {
-                spriteBatch.Draw(PudgeWarsGame.heroSprite, Vector2.Subtract(heroPositionVector, indentVector), new Rectangle(frame*32,(directionFlag-1)*64, 31, 63), Color.White);
+                spriteBatch.Draw(heroSprite, Vector2.Subtract(heroPositionVector, indentVector), new Rectangle(frame * 32, (directionFlag - 1) * 64, 31, 63), Color.White);
             }
         }
     }

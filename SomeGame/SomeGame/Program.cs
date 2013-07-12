@@ -12,7 +12,9 @@ namespace SomeGame
         {
             using (PudgeWarsGame game = new PudgeWarsGame())
             {
+               
                 game.Run();
+                
             }
         }
     }

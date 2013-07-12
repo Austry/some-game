@@ -8,17 +8,22 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace SomeGame
 {
-    class MouseController
+    class MouseController : DrawableGameComponent
     {
         public Vector2 mousePositionVector = new Vector2(0, 0);
 
         private MouseState mouseState;
+        private Texture2D cursorSprite;
+        private SpriteBatch spriteBatch;
+
+        public  MouseController(Game game,Texture2D cursorSprite):base(game) {
+            this.cursorSprite = cursorSprite;
+        }
+
+       
 
 
-
-
-
-        public void Update()
+        public  override void Update(GameTime gameTime)
         {
             
             mouseState = Mouse.GetState();
@@ -37,9 +42,10 @@ namespace SomeGame
                 mousePositionVector.Y = PudgeWarsGame.graphics.GraphicsDevice.Viewport.Height;
         }
 
-        public void Draw(SpriteBatch spriteBatch)
+        public override void Draw(GameTime gameTime)
         {
-            spriteBatch.Draw(PudgeWarsGame.cursorSprite, mousePositionVector, Color.White);
+            spriteBatch = (SpriteBatch)Game.Services.GetService(typeof(SpriteBatch));
+            spriteBatch.Draw(cursorSprite, mousePositionVector, Color.White);
         }
     }
 }
