@@ -20,8 +20,7 @@ namespace SomeGame
         static public GraphicsDeviceManager graphics;
         static public SpriteBatch spriteBatch;
         //--------------Textures-----------
-        static private Texture2D cursorSprite;
-        static private Texture2D heroSprite;
+        static public TexturesProvider textureProvider;
         //---------------------------------
 
         MouseController mouseConroller;
@@ -41,7 +40,7 @@ namespace SomeGame
         protected override void Initialize()
         {
             Window.Title = "PudgeWars";
-
+            textureProvider = new TexturesProvider(this);
 
             base.Initialize();
         }
@@ -49,18 +48,18 @@ namespace SomeGame
       
         protected override void LoadContent()
         {
-          
+            
+            
             spriteBatch = new SpriteBatch(GraphicsDevice);
             
             Services.AddService(typeof(SpriteBatch),spriteBatch);
             
-            cursorSprite = Content.Load<Texture2D>("cursor");
-            heroSprite = Content.Load<Texture2D>("hero-sprite");
+           
 
-            mouseConroller = new MouseController(this,cursorSprite);
+            mouseConroller = new MouseController(this,textureProvider.cursorSprite);
             Components.Add(mouseConroller);
 
-            mainHero = new MainHero(this,heroSprite);
+            mainHero = new MainHero(this, textureProvider.heroSprite);
             Components.Add(mainHero);
 
         
@@ -87,11 +86,18 @@ namespace SomeGame
    
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.White);
+            
+           // GraphicsDevice.Clear(Color.White);
+            if (mainHero.isHited)
+            {
+                GraphicsDevice.Clear(Color.Red);
+            }
+            else
+            {
+                GraphicsDevice.Clear(Color.CornflowerBlue);
+            }
+            
             spriteBatch.Begin();
-
-          
-
 
 
             base.Draw(gameTime);
@@ -100,6 +106,10 @@ namespace SomeGame
            
 
             
+        }
+
+        public TexturesProvider getTextureProvider() {
+            return textureProvider;
         }
     }
 }

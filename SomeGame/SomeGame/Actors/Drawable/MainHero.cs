@@ -11,16 +11,18 @@ namespace SomeGame.Actors
 {
     class MainHero : DrawableGameComponent
     {
-        
 
+        public bool isHited = false;
+        public Rectangle boxingRectangle = new Rectangle(); 
         //----Координаты героя
         public Vector2 heroPositionVector = new Vector2(0,0);
         //----Положение мыщи
         private MouseState mouseState = Mouse.GetState();
+        private KeyboardState keyboardState = Keyboard.GetState();
         //----Координаты точки, куда нужно переместится
         private Vector2 targetCoordinats = new Vector2(0,0);
         //----Вектор скорости героя
-        private Vector2 heroSpeedVector = new Vector2();
+        public Vector2 heroSpeedVector = new Vector2();
         //----- Триггер движения
         private bool isMoving = false;
         //----- Дистанция до указанной точки перемещения от героя
@@ -35,12 +37,16 @@ namespace SomeGame.Actors
         private int frame;
         //----- Текстура героя
         Texture2D heroSprite;
+        private Hook heroHook;
 
         SpriteBatch spriteBatch;
 
         public MainHero(Game game,Texture2D heroSprite):base(game) {
             heroPositionVector = Vector2.Add(heroPositionVector,indentVector);
             this.heroSprite = heroSprite;
+
+            heroHook = new Hook(game,this);
+            game.Components.Add(heroHook);
         }
 
     
@@ -49,7 +55,10 @@ namespace SomeGame.Actors
         public override void Update(GameTime gameTime) 
         {   
             mouseState = Mouse.GetState();
-            
+            //Расчет прямоугольника, олицетворяющего границы героя
+            boxingRectangle = new Rectangle((int)(heroPositionVector.X - indentVector.X), (int)(heroPositionVector.Y - indentVector.Y), 
+                                                    heroSprite.Width/6, heroSprite.Height/4);
+
             //------Обработка нажатия ПКМ
             if (mouseState.RightButton.Equals(ButtonState.Pressed))
             {
@@ -79,17 +88,7 @@ namespace SomeGame.Actors
                 {
                     directionFlag = 2;
                 }
-                     /*  if (targetCoordinats.X < heroPositionVector.X && targetCoordinats.Y < heroPositionVector.Y)
-                       {
-                           directionFlag = 3;
-                       }
-                       if (targetCoordinats.X >= heroPositionVector.X && targetCoordinats.Y <= heroPositionVector.Y)
-                       {
-                           directionFlag = 4;
-                       }
-                */
-
-              
+                                
                
 
                 //Определения вектора скорости
@@ -100,11 +99,28 @@ namespace SomeGame.Actors
                 heroSpeedVector = Vector2.Multiply(heroSpeedVector,3);
                 
 
+                
+
 
 
             }
+            //Обработка клавиши для броска крюка
+            keyboardState = Keyboard.GetState();
 
-            //-------------Обработка движения--------
+            if (heroHook.currentHookState == Hook.HOOK_STATE.NOT_READY_FOR_FROW)
+            {
+                if (keyboardState.IsKeyDown(Keys.Q))
+                {
+                    heroHook.currentHookState = Hook.HOOK_STATE.READY_FOR_FROW;
+                }
+            }
+            if (mouseState.LeftButton.Equals(ButtonState.Pressed) && heroHook.currentHookState == Hook.HOOK_STATE.READY_FOR_FROW)
+            {
+                heroHook.Frow(Mouse.GetState());
+
+            }
+
+            //-------------Обработка движения героя--------
             if(isMoving)
             {
                 distanceToTargetLocation = Vector2.Distance(heroPositionVector,targetCoordinats);
@@ -137,6 +153,12 @@ namespace SomeGame.Actors
             else {
                 spriteBatch.Draw(heroSprite, Vector2.Subtract(heroPositionVector, indentVector), new Rectangle(frame * 32, (directionFlag - 1) * 64, 31, 63), Color.White);
             }
+
+            
+
+            
+
+           
         }
     }
 }
