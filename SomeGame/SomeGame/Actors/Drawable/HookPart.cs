@@ -11,9 +11,7 @@ namespace SomeGame.Actors
     class HookPart: DrawableGameComponent
     {
         //Бокс для определения столкновений
-        public Rectangle boxingRectangle;
-        //Вектор координат
-        private Vector2 partPositionVector;
+        public RotatedRectangle boxingRectangle;
         // Вектор координат центра спрайта относительно левого верхнего угла
         private Vector2 partCenterCoordsVector;
         // Вектор скорости спрайта
@@ -38,12 +36,11 @@ namespace SomeGame.Actors
         public HookPart(Game game,Texture2D hookPartSprite, Vector2 partPositionVector,Hook currentHook):base(game) {
             this.currentHook = currentHook;
             partSprite = hookPartSprite;
-            this.partPositionVector = partPositionVector;
             partCenterCoordsVector = new Vector2(partSprite.Width/2, partSprite.Height/2);
             currentPartState = PART_STATE.STAND;
             colorData = new Color[partSprite.Width * partSprite.Height];
             partSprite.GetData(colorData);
-            
+            boxingRectangle = new RotatedRectangle(partPositionVector + partCenterCoordsVector,partSprite.Width,partSprite.Height,0);
         }
 
         public override void Update(GameTime gameTime) 
@@ -55,37 +52,29 @@ namespace SomeGame.Actors
                 
                 case PART_STATE.FLYING_FORVARD:
                     
-                    partPositionVector += partSpeedVector;
+                  //  partPositionVector += partSpeedVector;
+                    boxingRectangle.ChangePosition(partSpeedVector);
 
                     break;
                 case PART_STATE.FLYING_BACK:
+                    boxingRectangle.ChangePosition(-partSpeedVector);
+                    
                     if (boxingRectangle.Intersects(currentHook.currentHero.boxingRectangle))
                     {
                         isRendered = false;
                         currentPartState = PART_STATE.STAND;
-                        partPositionVector += currentHook.currentHero.heroPositionVector;
                         rotationAngle = 0;
+                        boxingRectangle.positionVector = currentHook.currentHero.heroPositionVector + partCenterCoordsVector;
+                        
                     }
-                    partPositionVector -= partSpeedVector;
-
                     break;
                 case PART_STATE.STAND:
-                    partPositionVector = currentHook.currentHero.heroPositionVector;
+                    boxingRectangle.ChangePosition(currentHook.currentHero.heroSpeedVector);
+                   
+
                     break;
             }
 
-
-            // Трансформация прямоугольника, симвализируюшего первый элемент крюка
-            Matrix partTransform =
-                Matrix.CreateTranslation(new Vector3(new Vector2(partSprite.Width/2,partSprite.Height/2), 0.0f)) *
-                Matrix.CreateRotationZ((float)rotationAngle) *
-                Matrix.CreateTranslation(new Vector3(partPositionVector, 0.0f));
-            
-            // Расчет параметров нового прямоугольника
-             boxingRectangle = CalculateBoundingRectangle(
-                     new Rectangle(0, 0, partSprite.Width, partSprite.Height),
-                     partTransform);
-            
         }
 
         public override void Draw(GameTime gameTime) 
@@ -93,15 +82,15 @@ namespace SomeGame.Actors
             spriteBatch = (SpriteBatch) Game.Services.GetService(typeof(SpriteBatch));
             if (isRendered)
             {
-               spriteBatch.Draw(partSprite, partPositionVector, null, Color.White, (float)rotationAngle,
-                                            partCenterCoordsVector, 1.0f, SpriteEffects.None, 0.0f);
-               //spriteBatch.Draw(partSprite, boxingRectangle, null, Color.White,0, partCenterCoordsVector, SpriteEffects.None, 0.0f);
+                spriteBatch.Draw(partSprite, new Vector2(boxingRectangle.X + (boxingRectangle.Width / 2), boxingRectangle.Y + (boxingRectangle.Height / 2)), null, Color.White, boxingRectangle.Rotation, partCenterCoordsVector, 1.0f, SpriteEffects.None, 0);
             }
         }
 
         public void SetRorationAngle(double angle){
             this.rotationAngle = angle;
+            this.boxingRectangle.Rotation=(float)angle;
         }
+        
         public void SetRendered(bool isRendered) {
             this.isRendered = isRendered;
         }
@@ -109,31 +98,7 @@ namespace SomeGame.Actors
             this.partSpeedVector = speedVector;
             
         }
-        private  Rectangle CalculateBoundingRectangle(Rectangle rectangle,
-                                                           Matrix transform)
-        {
-            // Get all four corners in local space
-            Vector2 leftTop = new Vector2(rectangle.Left, rectangle.Top);
-            Vector2 rightTop = new Vector2(rectangle.Right, rectangle.Top);
-            Vector2 leftBottom = new Vector2(rectangle.Left, rectangle.Bottom);
-            Vector2 rightBottom = new Vector2(rectangle.Right, rectangle.Bottom);
-
-            // Transform all four corners into work space
-            Vector2.Transform(ref leftTop, ref transform, out leftTop);
-            Vector2.Transform(ref rightTop, ref transform, out rightTop);
-            Vector2.Transform(ref leftBottom, ref transform, out leftBottom);
-            Vector2.Transform(ref rightBottom, ref transform, out rightBottom);
-
-            // Find the minimum and maximum extents of the rectangle in world space
-            Vector2 min = Vector2.Min(Vector2.Min(leftTop, rightTop),
-                                      Vector2.Min(leftBottom, rightBottom));
-            Vector2 max = Vector2.Max(Vector2.Max(leftTop, rightTop),
-                                      Vector2.Max(leftBottom, rightBottom));
-
-            // Return that as a rectangle
-            return new Rectangle((int)partPositionVector.X, (int)partPositionVector.Y,
-                                 (int)(max.X - min.X), (int)(max.Y - min.Y));
-        }
+       
     }
 
 }

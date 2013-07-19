@@ -17,6 +17,7 @@ namespace SomeGame.Actors
         private Vector2 frowTargetCoordsVector = new Vector2();
         private double rotationAngl = 0;
         private float hookSpeedCoef = 3;
+        private Game game;
         // Используеться в цикле управления частями крюка
         private int currentHookPartsNumber = 0;
         private Vector2 tempPartSpeedVector;
@@ -27,7 +28,13 @@ namespace SomeGame.Actors
 
         public Hook(Game game,MainHero hero):base(game) {
             currentHero = hero;
+            this.game = game;
+            InitHookParts(game);
+            
 
+
+        }
+        private void InitHookParts(Game game) {
             for (int i = 0; i < hookPartsArray.Length; i++)
             {
                 if (i == 0)
@@ -35,15 +42,15 @@ namespace SomeGame.Actors
                     hookPartsArray[i] = new HookPart(game, PudgeWarsGame.textureProvider.hookFirstElementSprite,
                                                                          currentHero.heroPositionVector, this);
                 }
-                else {
+                else
+                {
                     hookPartsArray[i] = new HookPart(game, PudgeWarsGame.textureProvider.hookElementSprite,
                                                                          currentHero.heroPositionVector, this);
                 }
                 game.Components.Add(hookPartsArray[i]);
             }
-
+        
         }
-
         public override void Update(GameTime gameTime)
         {
             if (hookPartsArray[0].boxingRectangle.Intersects(currentHero.boxingRectangle))
@@ -57,22 +64,25 @@ namespace SomeGame.Actors
                     currentHookPartsNumber++;
                 for (int i = 0; i < currentHookPartsNumber; i++)
                 {
+                    
                     hookPartsArray[i].SetRendered(true);
-                    hookPartsArray[i].currentPartState = HookPart.PART_STATE.FLYING_FORVARD;
                     hookPartsArray[i].SetRorationAngle(rotationAngl);
                     hookPartsArray[i].SetSpeedVector(tempPartSpeedVector);
+                   // hookPartsArray[i].SetBoxRorationAngle(rotationAngl);
+                    hookPartsArray[i].currentPartState = HookPart.PART_STATE.FLYING_FORVARD;
                     //Проверка на коллизию с предыдушим звеном цепи
                     if (currentHookPartsNumber < hookPartsArray.Length)
                     {
-                        Rectangle tempPartRect = hookPartsArray[currentHookPartsNumber].boxingRectangle;
-                        Rectangle tempPreviousPartRect = hookPartsArray[currentHookPartsNumber - 1].boxingRectangle;
+                        RotatedRectangle tempPartRect = hookPartsArray[currentHookPartsNumber].boxingRectangle;
+                        RotatedRectangle tempPreviousPartRect = hookPartsArray[currentHookPartsNumber - 1].boxingRectangle;
                         if(!tempPartRect.Intersects(tempPreviousPartRect)){
                             currentHookPartsNumber++;
                         }
                     }
                 }
                 //Проверка на вылет последнего звена цепи.
-                if(!hookPartsArray[hookPartsArray.Length-1].boxingRectangle.Intersects(currentHero.boxingRectangle)){
+                if (!currentHero.boxingRectangle.Intersects(hookPartsArray[hookPartsArray.Length - 1].boxingRectangle))
+                {
                     currentHookState = HOOK_STATE.FLYING_BACK;
                     foreach (HookPart part in hookPartsArray)
                     {
@@ -119,51 +129,10 @@ namespace SomeGame.Actors
            double tempSpeedX =     Math.Sin(rotationAngl) * hookSpeedCoef;
            double tempSpeedY = - Math.Cos(rotationAngl) * hookSpeedCoef;
            tempPartSpeedVector = new Vector2((float)tempSpeedX, (float)tempSpeedY);
-           
+          // InitHookParts(game);
            
             
         }
 
-        /// <summary>
-        /// Determines if there is overlap of the non-transparent pixels
-        /// between two sprites.
-        /// </summary>
-        /// <param name="rectangleA">Bounding rectangle of the first sprite</param>
-        /// <param name="dataA">Pixel data of the first sprite</param>
-        /// <param name="rectangleB">Bouding rectangle of the second sprite</param>
-        /// <param name="dataB">Pixel data of the second sprite</param>
-        /// <returns>True if non-transparent pixels overlap; false otherwise</returns>
-        public  bool IntersectPixels(Rectangle rectangleA, Color[] dataA,
-                                           Rectangle rectangleB, Color[] dataB)
-        {
-            // Find the bounds of the rectangle intersection
-            int top = Math.Max(rectangleA.Top, rectangleB.Top);
-            int bottom = Math.Min(rectangleA.Bottom, rectangleB.Bottom);
-            int left = Math.Max(rectangleA.Left, rectangleB.Left);
-            int right = Math.Min(rectangleA.Right, rectangleB.Right);
-
-            // Check every point within the intersection bounds
-            for (int y = top; y < bottom; y++)
-            {
-                for (int x = left; x < right; x++)
-                {
-                    // Get the color of both pixels at this point
-                    Color colorA = dataA[(x - rectangleA.Left) +
-                                         (y - rectangleA.Top) * rectangleA.Width];
-                    Color colorB = dataB[(x - rectangleB.Left) +
-                                         (y - rectangleB.Top) * rectangleB.Width];
-
-                    // If both pixels are not completely transparent,
-                    if (colorA.A != 0 && colorB.A != 0)
-                    {
-                        // then an intersection has been found
-                        return true;
-                    }
-                }
-            }
-
-            // No intersection found
-            return false;
-        }
     }
 }

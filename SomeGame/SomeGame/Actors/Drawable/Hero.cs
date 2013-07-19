@@ -13,7 +13,7 @@ namespace SomeGame.Actors
     {
 
         public bool isHited = false;
-        public Rectangle boxingRectangle = new Rectangle(); 
+        public RotatedRectangle boxingRectangle; 
         //----Координаты героя
         public Vector2 heroPositionVector = new Vector2(0,0);
         //----Положение мыщи
@@ -40,13 +40,14 @@ namespace SomeGame.Actors
         private Hook heroHook;
 
         SpriteBatch spriteBatch;
-
+        
         public MainHero(Game game,Texture2D heroSprite):base(game) {
-            heroPositionVector = Vector2.Add(heroPositionVector,indentVector);
+            
             this.heroSprite = heroSprite;
 
             heroHook = new Hook(game,this);
             game.Components.Add(heroHook);
+            boxingRectangle = new RotatedRectangle(heroPositionVector,heroSprite.Width / 6, heroSprite.Height / 4,0);
         }
 
     
@@ -56,16 +57,15 @@ namespace SomeGame.Actors
         {   
             mouseState = Mouse.GetState();
             //Расчет прямоугольника, олицетворяющего границы героя
-            boxingRectangle = new Rectangle((int)(heroPositionVector.X - indentVector.X), (int)(heroPositionVector.Y - indentVector.Y), 
-                                                    heroSprite.Width/6, heroSprite.Height/4);
 
+            
+            
             //------Обработка нажатия ПКМ
             if (mouseState.RightButton.Equals(ButtonState.Pressed))
             {
                 targetCoordinats.X = mouseState.X;
                 targetCoordinats.Y = mouseState.Y;
                 isMoving = true;
-                
                 //Определение направления движения
                 if (targetCoordinats.Y - heroPositionVector.Y >= targetCoordinats.X - heroPositionVector.X 
                     && targetCoordinats.Y - heroPositionVector.Y >= -(targetCoordinats.X - heroPositionVector.X))
@@ -92,8 +92,8 @@ namespace SomeGame.Actors
                
 
                 //Определения вектора скорости
-                heroSpeedVector.X = heroPositionVector.X - targetCoordinats.X;
-                heroSpeedVector.Y = heroPositionVector.Y - targetCoordinats.Y;
+                heroSpeedVector.X =  targetCoordinats.X - heroPositionVector.X;
+                heroSpeedVector.Y = targetCoordinats.Y - heroPositionVector.Y;
 
                 heroSpeedVector.Normalize();
                 heroSpeedVector = Vector2.Multiply(heroSpeedVector,3);
@@ -124,10 +124,15 @@ namespace SomeGame.Actors
             if(isMoving)
             {
                 distanceToTargetLocation = Vector2.Distance(heroPositionVector,targetCoordinats);
-                heroPositionVector = Vector2.Subtract(heroPositionVector,heroSpeedVector);
+                heroPositionVector += heroSpeedVector;
+                boxingRectangle.ChangePosition(heroSpeedVector);
+                
                 if (distanceToTargetLocation <= 3)
+                {
+                    heroSpeedVector.X = 0;
+                    heroSpeedVector.Y = 0;
                     isMoving = false;
-
+                }
             }
         
         }
@@ -148,10 +153,11 @@ namespace SomeGame.Actors
 
             if (!isMoving)
             {
-                spriteBatch.Draw(heroSprite, Vector2.Subtract(heroPositionVector, indentVector), new Rectangle(0, 0, 30, 62), Color.White);
+                spriteBatch.Draw(heroSprite, heroPositionVector, new Rectangle(0, 0, 30, 62), Color.White);
             }
             else {
-                spriteBatch.Draw(heroSprite, Vector2.Subtract(heroPositionVector, indentVector), new Rectangle(frame * 32, (directionFlag - 1) * 64, 31, 63), Color.White);
+                spriteBatch.Draw(heroSprite, heroPositionVector, new Rectangle(frame * 32, (directionFlag - 1) * 64, 31, 63), Color.White);
+                
             }
 
             

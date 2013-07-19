@@ -8,18 +8,23 @@ namespace SomeGame.Actors
 {
     class RotatedRectangle
     {
-        public Rectangle CollisionRectangle;
+       // public Rectangle CollisionRectangle;
+        public Vector2 positionVector;
+        private int width, height;
         public float Rotation;
         public Vector2 Origin;
 
-        public RotatedRectangle(Rectangle theRectangle, float theInitialRotation)
+        public RotatedRectangle(Vector2 positionVector,int width,int height, float theInitialRotation)
         {
-            CollisionRectangle = theRectangle;
+           // CollisionRectangle = theRectangle;
             Rotation = theInitialRotation;
+            this.positionVector = positionVector;
+            this.width = width;
+            this.height = height;
 
             //Calculate the Rectangles origin. We assume the center of the Rectangle will
             //be the point that we will be rotating around and we use that for the origin
-            Origin = new Vector2((int)theRectangle.Width / 2, (int)theRectangle.Height / 2);
+            Origin = new Vector2(width / 2, height / 2);
         }
 
         /// <summary>
@@ -27,10 +32,12 @@ namespace SomeGame.Actors
         /// </summary>
         /// <param name="theXPositionAdjustment"></param>
         /// <param name="theYPositionAdjustment"></param>
-        public void ChangePosition(int theXPositionAdjustment, int theYPositionAdjustment)
+        public void ChangePosition(Vector2 speed)
         {
-            CollisionRectangle.X += theXPositionAdjustment;
-            CollisionRectangle.Y += theYPositionAdjustment;
+
+            positionVector += speed;
+            //CollisionRectangle.X += (int)speed.X;
+            //CollisionRectangle.Y += (int)speed.Y;
         }
 
         /// <summary>
@@ -41,7 +48,7 @@ namespace SomeGame.Actors
         /// <returns></returns>
         public bool Intersects(Rectangle theRectangle)
         {
-            return Intersects(new RotatedRectangle(theRectangle, 0.0f));
+            return Intersects(new RotatedRectangle(new Vector2(theRectangle.X,theRectangle.Y),theRectangle.Width,theRectangle.Height, 0.0f));
         }
 
         /// <summary>
@@ -159,54 +166,55 @@ namespace SomeGame.Actors
             aTranslatedPoint.Y = (float)(theOrigin.Y + (thePoint.Y - theOrigin.Y) * Math.Cos(theRotation)
                 + (thePoint.X - theOrigin.X) * Math.Sin(theRotation));
             return aTranslatedPoint;
+            
         }
 
         public Vector2 UpperLeftCorner()
         {
-            Vector2 aUpperLeft = new Vector2(CollisionRectangle.Left, CollisionRectangle.Top);
+            Vector2 aUpperLeft = new Vector2(positionVector.X, positionVector.Y);
             aUpperLeft = RotatePoint(aUpperLeft, aUpperLeft + Origin, Rotation);
             return aUpperLeft;
         }
 
         public Vector2 UpperRightCorner()
         {
-            Vector2 aUpperRight = new Vector2(CollisionRectangle.Right, CollisionRectangle.Top);
+            Vector2 aUpperRight = new Vector2(positionVector.X + width, positionVector.Y);
             aUpperRight = RotatePoint(aUpperRight, aUpperRight + new Vector2(-Origin.X, Origin.Y), Rotation);
             return aUpperRight;
         }
 
         public Vector2 LowerLeftCorner()
         {
-            Vector2 aLowerLeft = new Vector2(CollisionRectangle.Left, CollisionRectangle.Bottom);
+            Vector2 aLowerLeft = new Vector2(positionVector.X, positionVector.Y + height);
             aLowerLeft = RotatePoint(aLowerLeft, aLowerLeft + new Vector2(Origin.X, -Origin.Y), Rotation);
             return aLowerLeft;
         }
 
         public Vector2 LowerRightCorner()
         {
-            Vector2 aLowerRight = new Vector2(CollisionRectangle.Right, CollisionRectangle.Bottom);
+            Vector2 aLowerRight = new Vector2(positionVector.X + width, positionVector.Y + height);
             aLowerRight = RotatePoint(aLowerRight, aLowerRight + new Vector2(-Origin.X, -Origin.Y), Rotation);
             return aLowerRight;
         }
 
-        public int X
+        public float X
         {
-            get { return CollisionRectangle.X; }
+            get { return positionVector.X; }
         }
 
-        public int Y
+        public float Y
         {
-            get { return CollisionRectangle.Y; }
+            get { return positionVector.Y; }
         }
 
         public int Width
         {
-            get { return CollisionRectangle.Width; }
+            get { return width; }
         }
 
         public int Height
         {
-            get { return CollisionRectangle.Height; }
+            get { return height; }
         }
 
     }

@@ -22,6 +22,7 @@ namespace SomeGame
         //--------------Textures-----------
         static public TexturesProvider textureProvider;
         //---------------------------------
+        
 
         MouseController mouseConroller;
         MainHero mainHero;
@@ -53,8 +54,6 @@ namespace SomeGame
             spriteBatch = new SpriteBatch(GraphicsDevice);
             
             Services.AddService(typeof(SpriteBatch),spriteBatch);
-            
-           
 
             mouseConroller = new MouseController(this,textureProvider.cursorSprite);
             Components.Add(mouseConroller);
@@ -74,12 +73,6 @@ namespace SomeGame
        
         protected override void Update(GameTime gameTime)
         {
-          
-
-        
-
-            
-            
             base.Update(gameTime);
         }
 

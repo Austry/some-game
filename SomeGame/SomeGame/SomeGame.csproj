@@ -110,12 +110,12 @@
   <ItemGroup>
     <Compile Include="Actors\Hook.cs" />
     <Compile Include="Actors\Drawable\HookPart.cs" />
-    <Compile Include="Actors\Drawable\MainHero.cs" />
+    <Compile Include="Actors\Drawable\Hero.cs" />
     <Compile Include="MouseController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="PudgeWarsGame.cs" />
-    <Compile Include="Actors\Drawable\RotatedRectangle.cs" />
+    <Compile Include="Actors\RotatedRectangle.cs" />
     <Compile Include="TexturesProvider.cs" />
   </ItemGroup>
   <ItemGroup>
