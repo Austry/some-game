@@ -160,11 +160,9 @@ namespace SomeGame.Actors
                 
             }
 
-            
-
-            
-
-           
+        }
+        public bool IsMoving() {
+            return isMoving;
         }
     }
 }

@@ -24,6 +24,7 @@ namespace SomeGame.Actors
         // Ссылка на крюк, к которому принадлежит часть.
         private Hook currentHook;
         private bool isRendered = false;
+        private Vector2 partFirstSpeedVector = new Vector2(0,0);
         
         public PART_STATE currentPartState;
 
@@ -51,13 +52,25 @@ namespace SomeGame.Actors
             {
                 
                 case PART_STATE.FLYING_FORVARD:
-                    
-                  //  partPositionVector += partSpeedVector;
+                    if (currentHook.currentHero.IsMoving())
+                    {
+                        Vector2 tempVect = currentHook.currentHero.heroPositionVector - boxingRectangle.positionVector;
+                        tempVect.Normalize();
+                        partSpeedVector = partFirstSpeedVector + tempVect;
+                    }
+                    else
+                    {
+                        partSpeedVector = partFirstSpeedVector;
+                    }
                     boxingRectangle.ChangePosition(partSpeedVector);
 
                     break;
                 case PART_STATE.FLYING_BACK:
-                    boxingRectangle.ChangePosition(-partSpeedVector);
+                    partSpeedVector= currentHook.currentHero.heroPositionVector - boxingRectangle.positionVector;
+                    partSpeedVector.Normalize();
+                    partSpeedVector = Vector2.Multiply(partSpeedVector,currentHook.hookSpeedCoef);
+
+                    boxingRectangle.ChangePosition(partSpeedVector);
                     
                     if (boxingRectangle.Intersects(currentHook.currentHero.boxingRectangle))
                     {
@@ -95,8 +108,11 @@ namespace SomeGame.Actors
             this.isRendered = isRendered;
         }
         public void SetSpeedVector(Vector2 speedVector) {
-            this.partSpeedVector = speedVector;
+            this.partFirstSpeedVector = speedVector;
             
+        }
+        public bool IsRendered() { 
+            return isRendered;
         }
        
     }

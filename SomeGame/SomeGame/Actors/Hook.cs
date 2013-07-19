@@ -16,7 +16,7 @@ namespace SomeGame.Actors
         private HookPart[] hookPartsArray = new HookPart[8];
         private Vector2 frowTargetCoordsVector = new Vector2();
         private double rotationAngl = 0;
-        private float hookSpeedCoef = 3;
+        public float hookSpeedCoef = 3;
         private Game game;
         // Используеться в цикле управления частями крюка
         private int currentHookPartsNumber = 0;
